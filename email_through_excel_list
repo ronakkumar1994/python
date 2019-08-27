@@ -1,0 +1,58 @@
+import smtplib
+import pandas as pd
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
+
+email_user = 'sender mail'
+email_password = 'password'
+
+
+subject = 'APPLICATION'
+
+msg = MIMEMultipart()
+msg['From'] = email_user
+msg['To'] = email_send
+msg['Subject'] = subject
+
+body=("""\
+<!DOCTYPE html>
+<html>
+    <body>
+        <p>Greetings,</p>
+		    <p>this multiline email code in python.</p>
+        <p>Many thanks in advance!!<br><br></p>
+
+        <p>Regards,<br>
+         xyz<br>
+        Email: r******@gmail.com<br>
+        Cell: +91-720****08</p>
+    </body>
+</html>
+""")#, subtype='html')
+msg.attach(MIMEText(body,'html'))
+
+
+
+
+
+filename='Resume1pg.pdf'#file to attach in a mail
+attachment  =open(filename,'rb')
+
+part = MIMEBase('application','octet-stream')
+part.set_payload((attachment).read())
+encoders.encode_base64(part)
+part.add_header('Content-Disposition',"attachment; filename= "+filename)
+
+msg.attach(part)
+text = msg.as_string()
+server = smtplib.SMTP('smtp.gmail.com',587)
+server.starttls()
+server.login(email_user,email_password)
+
+e=pd.read_excel("NEW.xlsx") #adress email to send in the xlsx file in column with first cell as emails
+emails = e['emails'].values
+for email_send in emails:    
+    server.sendmail(email_user,email_send,text)
+server.quit()
