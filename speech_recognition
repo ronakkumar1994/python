@@ -1,0 +1,88 @@
+import pyttsx3
+import speech_recognition as sr
+import datetime
+import wikipedia
+import webbrowser
+import os
+
+
+engine=pyttsx3.init('sapi5')
+voices=engine.getProperty('voices')
+#print(voices[0].id)
+
+engine.setProperty('voices',voices[0].id)#to set voice of male or female
+
+
+def speak(audio):
+    engine.say(audio)
+    engine.runAndWait()
+
+def wishme():
+    hr=int(datetime.datetime.now().hour)
+    if hr>=0 and hr<12:
+        speak("good morning !")
+    elif hr>=12 and hr<16:
+        speak("good afternoon !")
+    else:
+        speak("good evening! ")
+        
+    speak("sir! This is your jarvis ! ,  how may i help you")   
+
+def takecommand():
+    r=sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Listining...")
+        r.pause_threshold = 1
+        aud=r.listen(source)
+    try:
+        print("Recognizing..")
+        query=r.recognize_google(aud,language='en-in')
+        print(f"user said:{query}\n")
+    except Exception as e:
+        print(e)
+        print("say that again please...")
+        return "none"
+    return query
+        
+
+
+if __name__ == "__main__":
+    wishme()
+
+    while True :
+        query=takecommand().lower()
+        
+        if 'wikipedia' in query:
+            speak('searching wikipedia...')
+            query=query.replace("wikipedia","")
+            print(query)
+            results=wikipedia.summary(query,sentences=2)
+            speak("According to wikipedia")
+            print(results)
+            speak(results)
+        elif 'open youtube'in query:
+            webbrowser.open("youtube.com")
+        elif 'open google'in query:
+            webbrowser.open("google.com")
+        elif 'open linkedin'in query:
+            webbrowser.open("linkedin.com")
+        elif 'play music' in query :
+            music_dir="D:\\songs"
+            songs=os.listdir(music_dir)
+            print(songs)
+            os.startfile(os.path.join(music_dir,songs[0]))
+            while True :
+                query=takecommand().lower()
+                if 'stop music' in query :
+
+                    break     
+        
+        elif 'the time' in query:
+            strtime=datetime.datetime.now().strftime("%H:%M:%S")
+            speak(f"sir the time is {strtime}")
+        elif 'open code' in query:
+            vcode="C:\\Users\\Ronak kumar\\AppData\\Local\\Programs\\Microsoft VS Code\\code.exe"
+            os.startfile(vcode)
+        elif 'quit'in query:
+            speak("thankyou sir.  powering off!")
+            break
